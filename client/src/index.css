@@ -1,0 +1,399 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Bootstrap imports */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* Custom Overrides */
+@import './styles/bootstrap-overrides.css';
+
+/* Animations Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Modal Overlay Styles */
+.modal-backdrop-custom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(36, 55, 70, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.modal-content-custom {
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Drawer Sliding Panel Styles */
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(36, 55, 70, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 1040;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.drawer-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 1045;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer-container.open {
+  transform: translateX(0);
+}
+
+.drawer-sm { width: 420px; max-width: 100vw; }
+.drawer-md { width: 620px; max-width: 100vw; }
+.drawer-lg { width: 850px; max-width: 100vw; }
+
+/* Toast Notification Styles */
+.toast-container-custom {
+  position: fixed;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.toast-custom {
+  pointer-events: auto;
+  min-width: 320px;
+  max-width: 450px;
+  background-color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .toast-container-custom {
+    top: 32px;
+    right: 32px;
+    align-items: flex-end;
+  }
+  .toast-custom {
+    animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .toast-container-custom {
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+    width: calc(100% - 32px);
+  }
+  .toast-custom {
+    animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    min-width: 100%;
+  }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInDown {
+  from { transform: translateY(-120%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Collapsible Sidebar Transition */
+.sidebar-wrapper {
+  width: 260px;
+  min-width: 260px;
+  background-color: #ffffff;
+  border-right: 1px solid var(--ws-border);
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.sidebar-wrapper.collapsed {
+  width: 76px;
+  min-width: 76px;
+}
+
+/* Glassmorphism Styles (Floating buttons / speed dial overlays) */
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Speed Dial (Floating Action Button) */
+.speed-dial-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 999;
+}
+
+.speed-dial-trigger {
+  width: 56px;
+  height: 56px;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 15px rgba(43, 174, 155, 0.4);
+}
+
+.speed-dial-trigger svg {
+  transition: transform 0.25s ease;
+}
+
+.speed-dial-trigger.open svg {
+  transform: rotate(45deg);
+}
+
+.speed-dial-menu {
+  position: absolute;
+  bottom: 68px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.speed-dial-menu.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.speed-dial-item {
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Global Search Dropdown Overlay */
+.search-results-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid var(--ws-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1010;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Kanban Drag and Drop Styles */
+.kanban-column-container {
+  min-height: 500px;
+  background-color: #F8FAF8;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.kanban-card-dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+/* Dashboard Widget Layouts Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+}
+
+.dashboard-col-8 {
+  grid-column: span 8;
+}
+
+.dashboard-col-4 {
+  grid-column: span 4;
+}
+
+@media (max-width: 991.98px) {
+  .dashboard-col-8, .dashboard-col-4 {
+    grid-column: span 12;
+  }
+}
+
+/* Skeleton Shimmer Loading Style */
+.placeholder-shimmer {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer-anim 1.5s infinite linear;
+}
+
+@keyframes shimmer-anim {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Dropdown Menu Animations */
+.animate-scaleUp {
+  animation: scaleUp 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top right;
+}
+
+/* Dropdown link styles */
+.dropdown-item:active {
+  background-color: var(--ws-primary) !important;
+  color: white !important;
+}
+
+/* Hover background helpers */
+.hover-bg-light {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.hover-bg-light:hover {
+  background-color: var(--ws-light) !important;
+}
+.hover-bg-danger-light {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.hover-bg-danger-light:hover {
+  background-color: var(--ws-danger-light) !important;
+  color: var(--ws-danger) !important;
+}
+
+/* Off-canvas mobile responsive sidebar */
+@media (max-width: 991.98px) {
+  .sidebar-wrapper {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    z-index: 1100 !important;
+    height: 100vh !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  
+  .sidebar-wrapper.mobile-expanded {
+    transform: translateX(0) !important;
+  }
+  
+  .sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(36, 55, 70, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1090;
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+}
+
+/* Custom interactive item transitions */
+.btn, .nav-link, .card, .form-control, .form-select {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--ws-primary) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+/* Auth Left Panel Specific Premium Animations */
+@keyframes pulseBlob {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.15) translate(30px, -20px); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+
+@keyframes pulseBlob2 {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.1) translate(-20px, 30px); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.avatar-group-mock .mock-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 700;
+  color: white;
+}
+
+.max-w-lg {
+  max-width: 520px !important;
+}
+
+

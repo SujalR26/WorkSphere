@@ -1,0 +1,188 @@
+/* WorkSphere Custom Theme Variable System */
+:root {
+  --ws-bg: #F8FAF8;
+  --ws-card: #FFFFFF;
+  --ws-primary: #2BAE9B;
+  --ws-primary-rgb: 43, 174, 155;
+  --ws-secondary: #A78BFA;
+  --ws-secondary-rgb: 167, 139, 250;
+  --ws-accent: #F6B73C;
+  --ws-accent-dark: #D97706;
+  --ws-success: #58C27D;
+  --ws-danger: #F56C7E;
+  --ws-text: #243746;
+  --ws-text-muted: #64748B;
+  --ws-border: #E7ECEF;
+  --ws-light: #F1F5F9;
+  
+  /* Brand-specific light shades */
+  --ws-primary-light: rgba(43, 174, 155, 0.08);
+  --ws-secondary-light: rgba(167, 139, 250, 0.08);
+  --ws-success-light: rgba(88, 194, 125, 0.08);
+  --ws-danger-light: rgba(245, 108, 126, 0.08);
+  --ws-accent-light: rgba(246, 183, 60, 0.08);
+  --ws-info-light: rgba(14, 165, 233, 0.08);
+}
+
+/* Custom fonts setup classes */
+.font-heading {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.font-body {
+  font-family: 'Inter', sans-serif !important;
+}
+
+body {
+  font-family: 'Inter', sans-serif !important;
+  background-color: var(--ws-bg);
+  color: var(--ws-text);
+  overflow-x: hidden;
+}
+
+/* Buttons brand overrides */
+.btn-ws-primary {
+  background-color: var(--ws-primary) !important;
+  color: white !important;
+}
+.btn-ws-primary:hover {
+  background-color: #219281 !important;
+}
+.btn-ws-secondary {
+  background-color: var(--ws-secondary) !important;
+  color: white !important;
+}
+.btn-ws-secondary:hover {
+  background-color: #8B5CF6 !important;
+}
+.btn-ws-accent {
+  background-color: var(--ws-accent) !important;
+  color: white !important;
+}
+.btn-ws-accent:hover {
+  background-color: var(--ws-accent-dark) !important;
+}
+.btn-ws-success {
+  background-color: var(--ws-success) !important;
+  color: white !important;
+}
+.btn-ws-success:hover {
+  background-color: #48a66a !important;
+}
+.btn-ws-danger {
+  background-color: var(--ws-danger) !important;
+  color: white !important;
+}
+.btn-ws-danger:hover {
+  background-color: #e05264 !important;
+}
+.btn-ws-light {
+  background-color: var(--ws-light) !important;
+  color: var(--ws-text) !important;
+}
+.btn-ws-light:hover {
+  background-color: #E2E8F0 !important;
+}
+
+/* BG utilities overrides */
+.bg-ws-primary-light { background-color: var(--ws-primary-light) !important; }
+.bg-ws-secondary-light { background-color: var(--ws-secondary-light) !important; }
+.bg-ws-success-light { background-color: var(--ws-success-light) !important; }
+.bg-ws-danger-light { background-color: var(--ws-danger-light) !important; }
+.bg-ws-accent-light { background-color: var(--ws-accent-light) !important; }
+.bg-info-light { background-color: var(--ws-info-light) !important; }
+
+/* Text color utilities */
+.text-ws-primary { color: var(--ws-primary) !important; }
+.text-ws-secondary { color: var(--ws-secondary) !important; }
+.text-ws-accent { color: var(--ws-accent) !important; }
+.text-ws-accent-dark { color: var(--ws-accent-dark) !important; }
+.text-ws-success { color: var(--ws-success) !important; }
+.text-ws-danger { color: var(--ws-danger) !important; }
+.text-ws-text { color: var(--ws-text) !important; }
+
+/* Form Control styles */
+.form-control, .form-select {
+  border-radius: 8px !important;
+  border: 1px solid var(--ws-border) !important;
+  font-size: 0.875rem !important;
+  padding: 0.55rem 0.85rem !important;
+  color: var(--ws-text) !important;
+}
+
+/* Form Control Focus adjustments */
+.form-control:focus, .form-select:focus {
+  border-color: var(--ws-primary) !important;
+  box-shadow: 0 0 0 3px rgba(43, 174, 155, 0.1) !important;
+}
+
+/* Global Card Styling overrides */
+.card {
+  border-radius: 12px !important;
+  border: 1px solid var(--ws-border) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Card hover animation */
+.card-hover {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.04), 0 4px 8px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Transitions helper */
+.transition-all {
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Table overrides for sticky headers */
+.table-responsive-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--ws-border);
+}
+.table-sticky-header th {
+  position: sticky;
+  top: 0;
+  background-color: #F8FAF8 !important;
+  z-index: 1;
+}
+.table td, .table th {
+  padding: 1rem 1.25rem;
+  border-color: var(--ws-border);
+}
+.table tbody tr:hover {
+  background-color: rgba(43, 174, 155, 0.015) !important;
+}
+
+/* Custom Width Helpers */
+.max-w-sm { max-width: 400px; }
+.max-w-md { max-width: 550px; }
+.max-w-lg { max-width: 700px; }
+.max-w-xl { max-width: 900px; }
+.fs-7 { font-size: 0.875rem !important; }
+.fs-8 { font-size: 0.75rem !important; }
+.fs-9 { font-size: 0.65rem !important; }
+.gap-2\.5 { gap: 0.625rem !important; }
+.py-1\.5 { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; }
+.px-2\.5 { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
+
+/* Search Input Overlapping Fixes */
+.form-control.ps-5 {
+  padding-left: 3rem !important;
+}
+.form-control.ps-4 {
+  padding-left: 1.5rem !important;
+}
+.form-control.ps-3 {
+  padding-left: 1rem !important;
+}
+
+/* Ensure absolutely positioned search icons are perfectly vertically centered */
+.position-absolute.top-50.translate-middle-y {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}

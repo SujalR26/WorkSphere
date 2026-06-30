@@ -1,0 +1,25 @@
+# WorkSphere Authentication System Checklist
+
+- [ ] 1. Backend Dependencies & Model Update
+  - [ ] Install `jsonwebtoken` and `bcryptjs` on the server
+  - [ ] Add `password` and `role` fields to `server/models/Employee.js`
+  - [ ] Add bcrypt pre-save password hashing and verification method to `Employee.js`
+- [ ] 2. Backend Authentication API
+  - [ ] Implement `server/middleware/auth.middleware.js` (protect & authorize)
+  - [ ] Implement `server/controllers/auth.controller.js` (login, register, logout, me)
+  - [ ] Implement `server/routes/auth.routes.js`
+  - [ ] Mount `/api/auth` in `server/app.js` and configure CORS credentials and cookie parsing
+- [ ] 3. Database Seeding Update
+  - [ ] Modify `server/seed/seed.js` to assign `role` and hashed passwords (`Password123`) to seeded users
+  - [ ] Run seed script to populate updated database schemas
+- [ ] 4. Frontend State & Pages
+  - [ ] Create `client/src/context/AuthContext.jsx` for auth state provider
+  - [ ] Wrap application with `<AuthProvider>` in `client/src/main.jsx`
+  - [ ] Create components `ProtectedRoute.jsx` and `GuestRoute.jsx`
+  - [ ] Create authentication pages: `Login.jsx`, `Register.jsx`, `ForgotPassword.jsx`, `ResetPassword.jsx`
+- [ ] 5. Navigation & Profile Connect
+  - [ ] Update `client/src/App.jsx` routes to secure private pages
+  - [ ] Connect `DashboardLayout.jsx` avatar & logout button to AuthContext
+- [ ] 6. Verification & Audit
+  - [ ] Build client and start backend server
+  - [ ] Verify Register, Login, Refresh, Session Persistence, Logout, Protected Routes, and Role Authorization
