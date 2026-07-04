@@ -8,6 +8,7 @@ import AuthLeftPane from '../components/AuthLeftPane.jsx';
 import Button from '../design-system/Button.jsx';
 import Input from '../design-system/Input.jsx';
 import Icons from '../design-system/Icons.jsx';
+import { redirectToPing } from '../services/auth/pingAuth.js';
 
 // Premium Preset Avatars
 const PRESET_AVATARS = [
@@ -20,77 +21,61 @@ const PRESET_AVATARS = [
 ];
 
 export const Register = () => {
-  const { register: signup } = useAuth();
+  const { refreshUser } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
-  
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [apiError, setApiError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLocalLoading, setIsLocalLoading] = useState(false);
 
-  // Password strength states
-  const [passStrength, setPassStrength] = useState({ score: 0, label: 'Weak', color: 'bg-danger' });
+  // Avatar Selection
+  const [selectedAvatar, setSelectedAvatar] = useState(PRESET_AVATARS[0]);
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm({
-    defaultValues: { 
-      name: '', 
-      email: '', 
-      password: '', 
-      confirmPassword: ''
-    }
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: { name: '', email: '', password: '', phone: '' }
   });
 
-  const passwordVal = watch('password');
-
-  // Calculate password strength
-  useEffect(() => {
-    if (!passwordVal) {
-      setPassStrength({ score: 0, label: 'Weak', color: 'bg-danger' });
-      return;
-    }
-
-    let score = 0;
-    if (passwordVal.length >= 8) score++;
-    if (/[A-Z]/.test(passwordVal) && /[a-z]/.test(passwordVal)) score++;
-    if (/[0-9]/.test(passwordVal)) score++;
-    if (/[^A-Za-z0-9]/.test(passwordVal)) score++;
-
-    let label = 'Weak';
-    let color = 'bg-danger';
-
-    if (score === 2) {
-      label = 'Fair';
-      color = 'bg-warning';
-    } else if (score === 3) {
-      label = 'Good';
-      color = 'bg-info';
-    } else if (score === 4) {
-      label = 'Strong';
-      color = 'bg-success';
-    }
-
-    setPassStrength({ score, label, color });
-  }, [passwordVal]);
-
-  const onSubmit = async (data) => {
+  const handlePingSignUp = async () => {
     setIsLoading(true);
     setApiError('');
     try {
-      const payload = {
-        name: data.name,
-        email: data.email,
-        password: data.password
-      };
-      
-      await signup(payload);
-      showToast('Registration successful! Welcome to WorkSphere.', 'success');
-      navigate('/');
+      await redirectToPing();
     } catch (err) {
-      const errorMsg = err.message || 'Registration failed';
+      const errorMsg = err.message || 'Failed to redirect to Ping AIC authorization server.';
+      setApiError(errorMsg);
+      showToast(errorMsg, 'danger');
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmitLocal = async (data) => {
+    setIsLocalLoading(true);
+    setIsLoading(true);
+    setApiError('');
+
+    const registrationData = {
+      ...data,
+      avatar: selectedAvatar
+    };
+
+    try {
+      const res = await apiClient.post('/auth/register', registrationData);
+      if (res.success) {
+        showToast('Account registered successfully! Logging you in...', 'success');
+        
+        // Auto login after local registration
+        await refreshUser();
+        navigate('/');
+      } else {
+        setApiError(res.message || 'Registration failed.');
+      }
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || err.message || 'Registration failed';
       setApiError(errorMsg);
       showToast(errorMsg, 'danger');
     } finally {
+      setIsLocalLoading(false);
       setIsLoading(false);
     }
   };
@@ -104,9 +89,11 @@ export const Register = () => {
           style={{ backdropFilter: 'blur(4px)' }}
         >
           <div className="spinner-border text-ws-primary" role="status" style={{ width: '40px', height: '40px' }}>
-            <span className="visually-hidden">Creating account...</span>
+            <span className="visually-hidden">Authenticating...</span>
           </div>
-          <p className="font-heading fw-semibold text-ws-primary mt-3 fs-7 animate-pulse">Building your profile...</p>
+          <p className="font-heading fw-semibold text-ws-primary mt-3 fs-7 animate-pulse">
+            {isLocalLoading ? 'Creating local account...' : 'Redirecting to Ping Identity...'}
+          </p>
         </div>
       )}
 
@@ -114,11 +101,11 @@ export const Register = () => {
       <AuthLeftPane subtitle="Join thousands of professionals managing their corporate workload with modern interface standards." />
 
       {/* Right Pane - Registration Form */}
-      <div className="col-12 col-md-7 col-lg-6 d-flex align-items-center justify-content-center p-4 p-md-5 bg-white overflow-auto" style={{ maxHeight: '100vh' }}>
-        <div className="w-100 max-w-sm my-auto animate-slideUp">
+      <div className="col-12 col-md-7 col-lg-6 d-flex align-items-center justify-content-center p-4 p-md-5 bg-white overflow-auto animate-fadeIn" style={{ maxHeight: '100vh' }}>
+        <div className="w-100 max-w-sm my-auto py-4 animate-slideUp">
           <div className="mb-4">
-            <h2 className="font-heading fw-bold text-dark mb-1" style={{ letterSpacing: '-0.5px' }}>Create Account</h2>
-            <p className="text-muted fs-8">Provide details to register with your enterprise workspace directory.</p>
+            <h2 className="font-heading fw-bold text-dark mb-1" style={{ letterSpacing: '-0.5px' }}>Register Account</h2>
+            <p className="text-muted fs-8">Register directly via Ping Identity SSO or configure a local workspace profile.</p>
           </div>
 
           {apiError && (
@@ -128,12 +115,38 @@ export const Register = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="d-flex flex-column gap-3.5">
-            
+          {/* Ping SSO Sign Up */}
+          <div className="d-flex flex-column gap-3">
+            <Button
+              onClick={handlePingSignUp}
+              loading={isLoading && !isLocalLoading}
+              className="w-100 py-3 fs-7 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2.5 rounded-3 bg-ws-primary text-white border-0"
+              style={{ minHeight: '48px' }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'translateY(-1px)' }}>
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="23" y1="11" x2="17" y2="11"></line>
+              </svg>
+              Register via Ping AIC
+            </Button>
+          </div>
+
+          {/* Visual Divider */}
+          <div className="d-flex align-items-center my-4">
+            <div className="border-bottom w-100" style={{ borderColor: 'var(--ws-border)' }}></div>
+            <span className="px-3 fs-9 text-muted fw-semibold text-uppercase text-nowrap">Or register locally</span>
+            <div className="border-bottom w-100" style={{ borderColor: 'var(--ws-border)' }}></div>
+          </div>
+
+          {/* Local Account Registration Form */}
+          <form onSubmit={handleSubmit(onSubmitLocal)} className="d-flex flex-column gap-3.5">
             <Input
               label="Full Name"
               name="name"
-              placeholder="Disha Dubey"
+              type="text"
+              placeholder="Sarah Jenkins"
               required
               aria-label="Full Name"
               error={errors.name?.message}
@@ -141,12 +154,12 @@ export const Register = () => {
             />
 
             <Input
-              label="Email Address"
+              label="Enterprise Email"
               name="email"
               type="email"
-              placeholder="disha.dubey@worksphere.com"
+              placeholder="name@worksphere.com"
               required
-              aria-label="Email Address"
+              aria-label="Enterprise Email"
               error={errors.email?.message}
               {...register('email', {
                 required: 'Email is required',
@@ -154,89 +167,80 @@ export const Register = () => {
               })}
             />
 
-            {/* Passwords Input Fields */}
-            <div className="row g-3">
-              <div className="col-12 col-sm-6 position-relative">
-                <Input
-                  label="Password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  required
-                  aria-label="Password"
-                  error={errors.password?.message}
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: { value: 6, message: 'Password must be at least 6 characters' }
-                  })}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="btn btn-link p-0 text-muted position-absolute border-0 bg-transparent"
-                  style={{ top: '36px', right: '14px', zIndex: 10, textDecoration: 'none' }}
-                  title={showPassword ? "Hide password" : "Show password"}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <Icons.Close size={16} /> : <Icons.Menu size={16} style={{ opacity: 0.5 }} />}
-                </button>
-              </div>
+            <div className="position-relative">
+              <Input
+                label="Secure Password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                required
+                aria-label="Secure Password"
+                error={errors.password?.message}
+                {...register('password', {
+                  required: 'Password is required',
+                  minLength: { value: 6, message: 'Password must be at least 6 characters' }
+                })}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="btn btn-link p-0 text-muted position-absolute border-0 bg-transparent"
+                style={{
+                  top: '36px',
+                  right: '14px',
+                  zIndex: 10,
+                  textDecoration: 'none'
+                }}
+                title={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <Icons.Close size={16} /> : <Icons.Menu size={16} style={{ opacity: 0.5 }} />}
+              </button>
+            </div>
 
-              <div className="col-12 col-sm-6 position-relative">
-                <Input
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  required
-                  aria-label="Confirm Password"
-                  error={errors.confirmPassword?.message}
-                  {...register('confirmPassword', {
-                    required: 'Please confirm password',
-                    validate: value => value === passwordVal || 'Passwords do not match'
-                  })}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="btn btn-link p-0 text-muted position-absolute border-0 bg-transparent"
-                  style={{ top: '36px', right: '14px', zIndex: 10, textDecoration: 'none' }}
-                  title={showConfirmPassword ? "Hide password" : "Show password"}
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                >
-                  {showConfirmPassword ? <Icons.Close size={16} /> : <Icons.Menu size={16} style={{ opacity: 0.5 }} />}
-                </button>
+            <Input
+              label="Phone Number (Optional)"
+              name="phone"
+              type="text"
+              placeholder="+1 (555) 019-2834"
+              aria-label="Phone Number"
+              error={errors.phone?.message}
+              {...register('phone')}
+            />
+
+            {/* Avatar Selector */}
+            <div className="mb-2">
+              <label className="form-label fs-8 text-muted fw-semibold mb-2">Select Profile Avatar</label>
+              <div className="d-flex align-items-center justify-content-between p-2.5 border rounded-3 bg-light" style={{ borderColor: 'var(--ws-border)' }}>
+                <div className="d-flex gap-2 overflow-auto">
+                  {PRESET_AVATARS.map((url, i) => (
+                    <img
+                      key={i}
+                      src={url}
+                      alt={`Avatar seed ${i}`}
+                      onClick={() => setSelectedAvatar(url)}
+                      className={`rounded-circle border cursor-pointer transition-all ${
+                        selectedAvatar === url ? 'border-ws-primary shadow-sm scale-110' : 'border-light'
+                      }`}
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        padding: '2px',
+                        backgroundColor: '#fff',
+                        transition: '0.15s ease-in-out'
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Password Strength Indicator */}
-            {passwordVal && (
-              <div className="p-2 rounded-3 bg-light border border-light">
-                <div className="d-flex align-items-center justify-content-between mb-1.5 fs-9 text-muted fw-semibold">
-                  <span>Password Security:</span>
-                  <span className={`fw-bold text-capitalize ${passStrength.color.replace('bg-', 'text-')}`}>
-                    {passStrength.label}
-                  </span>
-                </div>
-                <div className="progress" style={{ height: '4px', borderRadius: '2px' }}>
-                  <div 
-                    className={`progress-bar transition-all ${passStrength.color}`}
-                    role="progressbar" 
-                    style={{ width: `${(passStrength.score / 4) * 100}%` }}
-                    aria-valuenow={(passStrength.score / 4) * 100} 
-                    aria-valuemin="0" 
-                    aria-valuemax="100"
-                  />
-                </div>
-              </div>
-            )}
-
-            <Button type="submit" loading={isLoading} className="w-100 py-2.5 fs-7 fw-bold shadow-sm mt-1">
+            <Button type="submit" loading={isLocalLoading} className="w-100 py-2.5 fs-7 fw-bold shadow-sm mt-1">
               Create Account
             </Button>
           </form>
-          
-          <div className="text-center mt-4 border-top border-light pt-3">
+
+          <div className="text-center mt-4.5 border-top border-light pt-3.5">
             <span className="fs-8 text-muted">Already have an account? </span>
             <Link to="/login" className="fs-8 text-ws-primary text-decoration-none fw-bold hover-underline">
               Sign In

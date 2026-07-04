@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login, logout, getMe, forgotPassword, resetPassword } from '../controllers/auth.controller.js';
+import { register, login, logout, getMe, forgotPassword, resetPassword, getPingAuthUrl, pingCallback } from '../controllers/auth.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 import { resetPasswordRateLimiter } from '../middleware/rateLimiter.js';
 
@@ -11,6 +11,10 @@ router.post('/logout', protect, logout);
 router.get('/me', protect, getMe);
 router.post('/forgot-password', resetPasswordRateLimiter, forgotPassword);
 router.post('/reset-password/:token', resetPassword);
+
+// Ping AIC OIDC Routes
+router.get('/ping/auth-url', getPingAuthUrl);
+router.post('/ping/callback', pingCallback);
 
 
 export default router;

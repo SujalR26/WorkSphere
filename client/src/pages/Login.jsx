@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useUI } from '../context/UIContext.jsx';
+import { redirectToPing } from '../services/auth/pingAuth.js';
 import AuthLeftPane from '../components/AuthLeftPane.jsx';
 import Button from '../design-system/Button.jsx';
 import Input from '../design-system/Input.jsx';
@@ -15,6 +16,7 @@ export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLocalLoading, setIsLocalLoading] = useState(false);
 
   // Remember Me state
   const [rememberMe, setRememberMe] = useState(false);
@@ -32,7 +34,21 @@ export const Login = () => {
     }
   }, [setValue]);
 
-  const onSubmit = async (data) => {
+  const handlePingSignIn = async () => {
+    setIsLoading(true);
+    setApiError('');
+    try {
+      await redirectToPing();
+    } catch (err) {
+      const errorMsg = err.message || 'Failed to redirect to Ping AIC authorization server.';
+      setApiError(errorMsg);
+      showToast(errorMsg, 'danger');
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmitLocal = async (data) => {
+    setIsLocalLoading(true);
     setIsLoading(true);
     setApiError('');
     try {
@@ -52,6 +68,7 @@ export const Login = () => {
       setApiError(errorMsg);
       showToast(errorMsg, 'danger');
     } finally {
+      setIsLocalLoading(false);
       setIsLoading(false);
     }
   };
@@ -65,9 +82,11 @@ export const Login = () => {
           style={{ backdropFilter: 'blur(4px)' }}
         >
           <div className="spinner-border text-ws-primary" role="status" style={{ width: '40px', height: '40px' }}>
-            <span className="visually-hidden">Signing in...</span>
+            <span className="visually-hidden">Authenticating...</span>
           </div>
-          <p className="font-heading fw-semibold text-ws-primary mt-3 fs-7 animate-pulse">Authenticating credentials...</p>
+          <p className="font-heading fw-semibold text-ws-primary mt-3 fs-7 animate-pulse">
+            {isLocalLoading ? 'Verifying local credentials...' : 'Redirecting to Ping Identity...'}
+          </p>
         </div>
       )}
 
@@ -79,7 +98,7 @@ export const Login = () => {
         <div className="w-100 max-w-sm my-auto animate-slideUp">
           <div className="mb-4">
             <h2 className="font-heading fw-bold text-dark mb-1" style={{ letterSpacing: '-0.5px' }}>Welcome Back</h2>
-            <p className="text-muted fs-8">Enter your credentials to access your secure workplace dashboard.</p>
+            <p className="text-muted fs-8">Access your dashboard via Ping Identity SSO or enter your local credentials.</p>
           </div>
 
           {apiError && (
@@ -89,7 +108,31 @@ export const Login = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="d-flex flex-column gap-3.5">
+          {/* OIDC Login Trigger */}
+          <div className="d-flex flex-column gap-3">
+            <Button
+              onClick={handlePingSignIn}
+              loading={isLoading && !isLocalLoading}
+              className="w-100 py-3 fs-7 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2.5 rounded-3 bg-ws-primary text-white border-0"
+              style={{ minHeight: '48px' }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'translateY(-1px)' }}>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Sign In with Ping AIC
+            </Button>
+          </div>
+
+          {/* Visual Divider */}
+          <div className="d-flex align-items-center my-4">
+            <div className="border-bottom w-100" style={{ borderColor: 'var(--ws-border)' }}></div>
+            <span className="px-3 fs-9 text-muted fw-semibold text-uppercase text-nowrap">Or use local credentials</span>
+            <div className="border-bottom w-100" style={{ borderColor: 'var(--ws-border)' }}></div>
+          </div>
+
+          {/* Local Login Form */}
+          <form onSubmit={handleSubmit(onSubmitLocal)} className="d-flex flex-column gap-3.5">
             <Input
               label="Enterprise Email"
               name="email"
@@ -154,7 +197,7 @@ export const Login = () => {
               </Link>
             </div>
 
-            <Button type="submit" loading={isLoading} className="w-100 py-2.5 fs-7 fw-bold shadow-sm mt-1">
+            <Button type="submit" loading={isLocalLoading} className="w-100 py-2.5 fs-7 fw-bold shadow-sm mt-1">
               Sign In
             </Button>
           </form>
