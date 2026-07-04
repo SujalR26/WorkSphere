@@ -37,6 +37,7 @@ const Login = lazy(() => import('./pages/Login.jsx'));
 const Register = lazy(() => import('./pages/Register.jsx'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'));
+const Callback = lazy(() => import('./pages/Callback.jsx'));
 
 
 // Suspense Fallback Loading Spinner
@@ -65,6 +66,7 @@ function App() {
                   <Route path="/register" element={<Register />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/reset-password/:token" element={<ResetPassword />} />
+                  <Route path="/callback" element={<Callback />} />
                 </Route>
                 
                 {/* Protected Workspace Application Routes */}
